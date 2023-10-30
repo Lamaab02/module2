@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<link rel="stylesheet" type="text/css" href="styles.css">
+<script src="https://d3js.org/d3.v6.min.js"></script>
+<h2>Top artists for 2023</h2>
+<div id="firstdv"></div>
+<h3>Looking at the most popular singers in 2023, taylor swift is coming close to be the most popular singer! having over 14 billion streams</h3>
+<h4>Reading what the garduian article i chose said about taylor swift made me think about exploring some of the data around her as a singer, since as the article mentioned Taylor wasnt so popular around 2015, infact I remember liking taylor swift was for the lack of better words "cringy" and not so trendy. So what happened? when did she get back to the top? did it happen just in a vaccum or did she climb her way up</h4>
+<h4>As the article mentions, in 2015 Taylor faced a lot of hate. So I will be exploring the top 10 artists from years after 2015, to see when did taylorswift get more attraction</h4>
+<h2>When did Taylor get to the top charts</h2>
+<button onclick="update(data1)">2017</button>
+<button onclick="update(data2)">2018</button>
+<button onclick="update(data3)">2019</button>
+<div id="seconddv"></div>
+<h4>as you can see, taylor became one of the top 10 artists ever since 2018 and she never left the charts.</h4>
+<h5>What's remarkable about Taylor Swift is that her prominence as one of the most-streamed artists isn't solely attributed to her releasing new music. While her album "Reputation" debuted in 2017, it gained a significant following in 2018, marking her entry into the list of top 10 most-streamed artists. This transformation was due to her strategic rebranding efforts. In 2018, she released a documentary movie, a unique step in her career that propelled her back into the limelight. She repeated this success with her "Eras" tour. Interestingly, this tour didn't feature entirely new music, but rather reimagined her previous work.Surprisingly, it was through re-recording her old music that she achieved unprecedented levels of publicity and fame. Let's delve into more specific data regarding Taylor Swift's remarkable work.  </h5>
+<div id="thirddv"></div>
+<h3>Exploring this data, its really crazy the her rerecorded work has gained more popularity than her original work. Anything with the title (taylors virsion) means that she rerecoded it to reclaim her stolen work.</h3>
+<h4>I beleive that her deciding to reclaim her work made her more famous and now people are more excited to hear her old songs in a newer light! </h4>
+<h6>Done By Lia Abed</h6>
+<script>
+    let maxStreams;
+    const margin = {top:10, right:30, bottom:90, left:100},
+    width = 1000 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom;
+
+    const svg = d3.select("#firstdv")
+    .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform",
+        `translate(${margin.left}, ${margin.top})`);  
+
+    
+    // 2017
+    const data1 = [
+    { artist_name: "Ed Sheeran", streams: 4467942169 },
+    { artist_name: "Drake", streams: 2227083265 },
+    { artist_name: "The Chainsmokers", streams: 2186613567 },
+    { artist_name: "Kendrick Lamar", streams: 1781229102 },
+    { artist_name: "Luis Fonsi", streams: 1754842382 },
+    { artist_name: "Post Malone", streams: 1742036946 },
+    { artist_name: "Calvin Harris", streams: 1236576778 },
+    { artist_name: "J Balvin", streams: 1218138210 },
+    { artist_name: "Imagine Dragons", streams: 1147813344 },
+    { artist_name: "DJ Khaled", streams: 1112079867 }
+    ];
+    //2018
+    const data2 = [   
+        { artist_name: "Post Malone", streams: 3145868000 },
+        { artist_name: "Drake", streams: 3304426000 },
+        { artist_name: "Migos", streams: 1903032000 },
+        { artist_name: "XXXTentacion", streams: 1027226000 },
+        { artist_name: "J. Cole", streams: 1530496000 },
+        { artist_name: "Ed Sheeran", streams: 1103995000 },
+        { artist_name: "Kendrick Lamar", streams: 1424425000 },
+        { artist_name: "The Weeknd", streams: 1314121000 },
+        { artist_name: "Eminem", streams: 1031565000 },
+        { artist_name: "Taylor Swift", streams: 1027226000 }
+    ];
+
+    const data3 = [
+        {artist_name: "Post Malone" ,  streams: 6700000000  },
+        {artist_name:  "Drake",  streams:  6350000000},
+        {artist_name: "Billie Elish"  ,  streams:  4990000000},
+        {artist_name: "Ariana Grande" ,  streams:  4980000000},
+        {artist_name:  "Youngboy Never",  streams:  4880000000},
+        {artist_name:  "Juice Wrld",  streams:  3910000000},
+        {artist_name:  "xxxTentaction",  streams:  3640000000},
+        {artist_name: " Taylor Swift",  streams:  3540000000},
+        {artist_name: "Eminem" ,  streams:  3480000000},
+        {artist_name: "Khalid" ,  streams:  3260000000}
+
+    ];  
+
+
+   d3.csv("spotify-2023.csv").then(function(data){
+    
+    const groupedData = d3.group(data, d=> d["artist(s)_name"]);
+    const artistStreamData = [];
+
+    groupedData.forEach((value, key) => {
+        const totalStreams = d3.sum(value, d => +d.streams);
+        artistStreamData.push({ artist: key, totalStreams: totalStreams });
+    })
+    artistStreamData.sort((a, b) => b.totalStreams - a.totalStreams);
+ 
+    const top10Artists = artistStreamData.slice(0, 10);
+
+    maxStreams = Math.ceil(top10Artists[0].totalStreams / 1000) * 1000;
+    
+
+    const x = d3.scaleLinear()
+        .domain([0, maxStreams])
+        .range([ 0, width]); 
+    svg.append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(d3.axisBottom(x))
+        .selectAll("text")
+            .attr("transform", "translate(-10,0)rotate(-45)")
+            .style("text-anchor", "end");
+
+    const y = d3.scaleBand()
+        .range([ 0, height ])
+        .domain(top10Artists.map(function(d) { return d.artist; }))
+        .padding(1);
+    svg.append("g")
+        .call(d3.axisLeft(y))
+
+    
+    svg.selectAll("myline")
+    .data(top10Artists)
+    .join("line")
+        .attr("x1", x(0))
+        .attr("x2", x(0))
+        .attr("y1", function(d) { return y(d.artist) + y.bandwidth() / 2; }) 
+        .attr("y2", function(d) { return y(d.artist) + y.bandwidth() / 2; })
+        .attr("stroke", "grey")
+
+    svg.selectAll("mycircle")
+        .data(top10Artists)
+        .join("circle")
+            .attr("cx", x(0) )
+            .attr("cy", function(d) { return y(d.artist); })
+            .attr("r", "7")
+            .style("fill", "#69b3a2")
+            .attr("stroke", "black")
+
+   svg.selectAll("circle")
+        .transition()
+        .duration(2000)
+        .attr("cx", function(d) { return x(d.totalStreams); })
+    svg.selectAll("line")
+        .transition()
+        .duration(2000)
+        .attr("x1", function(d) { return x(d.totalStreams); })
+
+   });
+    
+   const svg2 = d3.select("#seconddv")
+        .append("svg")
+            .attr("width", width + margin.left + margin.right + 300)
+            .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+            .attr("transform", `translate(${margin.left},${margin.top})`);
+    const x2 = d3.scaleBand()
+        .range([ 0, width ])
+        .padding(0.2);
+    const xAxis = svg2.append("g")
+         .attr("transform", `translate(0,${height})`)
+    const y2 = d3.scaleLinear()
+        .range([ height, 0]);
+    const yAxis = svg2.append("g")
+        .attr("class", "myYaxis")
+    function update(data) {
+        x2.domain(data.map(d => d.artist_name))
+        xAxis.call(d3.axisBottom(x2))
+        y2.domain([0, d3.max(data, d => d.streams) ]);
+        yAxis.transition().duration(1000).call(d3.axisLeft(y2));
+        var u = svg2.selectAll("rect")
+            .data(data)
+        u
+            .join("rect")
+            .transition()
+            .duration(1000)
+                .attr("x", d => x2(d.artist_name))
+                .attr("y", d => y2(d.streams))
+                .attr("width", x2.bandwidth())
+                .attr("height", d => height - y2(d.streams))
+                .attr("fill", "#69b3a2")
+        }
+
+    update(data1)
+    
+    const svg3 = d3.select("#thirddv")
+            .append("svg")
+            .attr("width", width * 2)
+            .attr("height", height)
+    const g = svg3.append("g") 
+            
+
+    d3.csv("tswift.csv").then( function(data){
+        const albums = d3.rollup(
+            data,
+            v => d3.sum(v, d => d.popularity),
+            d => d.album
+        );
+        const albumsArray = Array.from(albums, ([album, popularity]) => ({ album, popularity }));
+       
+        const color = d3.scaleOrdinal()
+            .domain(albumsArray.map(d => d.album))
+            .range(d3.schemeSet1);
+        const size = d3.scaleLinear()
+        .domain([0, d3.max(albumsArray, d => d.popularity)]) 
+        .range([7,100]) 
+
+        const Tooltip = d3.select("#thirddv")
+            .append("div")
+            .style("opacity", 0)
+            .attr("class", "tooltip")
+            .style("background-color", "white")
+            .style("border", "solid")
+            .style("border-width", "2px")
+            .style("border-radius", "5px")
+            .style("padding", "5px")
+        const mouseover = function(event, d) {
+            Tooltip
+            .style("opacity", 1)
+        }
+        const mousemove = function(event, d) {
+            Tooltip
+                .html('<u>' + d.album + '</u>' + "<br>" + d.popularity + " million views")
+                .style("left", (event.clientX) + "px")
+                .style("top", (event.clientY) + "px")
+        }
+        var mouseleave = function(event, d) {
+            Tooltip
+            .style("opacity", 0)
+        }
+
+            const albumsData = Array.from(albums, ([album, popularity]) => ({ album, popularity }));
+            
+            console.log(data)
+        var node = svg3.append("g")
+            .selectAll("circle")
+            .data(albumsData)
+            .join("circle")
+            .attr("class", "node")
+            .attr("r", d => size(d.popularity))
+            .style("fill", d => color(d.album))
+            .style("fill-opacity", 0.8)
+            .attr("stroke", "black")
+            .style("stroke-width", 1)
+            .on("mouseover", mouseover) 
+            .on("mousemove", mousemove)
+            .on("mouseleave", mouseleave)
+            .call(d3.drag() 
+                .on("start", dragstarted)
+                .on("drag", dragged)
+                .on("end", dragended));
+
+            
+            const simulation = d3.forceSimulation(albumsData)
+                .force("center", d3.forceCenter().x(width / 2).y(height / 2))
+                .force("charge", d3.forceManyBody().strength(.1)) 
+                .force("collide", d3.forceCollide().strength(.2).radius(function(d){ return (size(d.popularity)+3) }).iterations(1)) 
+
+            simulation
+                .on("tick", function(){
+                    node
+                        .attr("cx", d => d.x)
+                        .attr("cy", d => d.y)
+                });
+            
+        
+         simulation.restart();
+         simulation.alpha(1).alphaTarget(0).restart(); 
+
+        function dragstarted(event, d) {
+            if (!event.active) simulation.alphaTarget(.03).restart();
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+        function dragged(event, d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+        function dragended(event, d) {
+            if (!event.active) simulation.alphaTarget(.03);
+            d.fx = null;
+            d.fy = null;
+        }
+    });
+
+</script>
